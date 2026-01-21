@@ -8,6 +8,7 @@
 import * as blessed from "blessed";
 import {
   GameState,
+  GameKind,
   autoMove,
   cancelHeld,
   createGame,
@@ -16,6 +17,7 @@ import {
   normalizeState,
 } from "./game";
 import { renderBoard, renderHelp, renderInfo } from "./render";
+import { resolveTheme, ThemeName } from "./theme";
 
 /**
  * Start the interactive UI loop.
@@ -24,16 +26,24 @@ import { renderBoard, renderHelp, renderInfo } from "./render";
  */
 export function startUi(
   options: {
+    game?: GameKind;
     drawCount?: number;
     seed?: number;
     useColor?: boolean;
     compact?: boolean;
+    theme?: ThemeName;
   } = {},
 ): void {
-  let state = createGame({ drawCount: options.drawCount, seed: options.seed });
+  let state = createGame({
+    drawCount: options.drawCount,
+    seed: options.seed,
+    game: options.game,
+  });
+  const theme = resolveTheme(options.theme);
 
   const screen = blessed.screen({ smartCSR: true, fullUnicode: true });
-  screen.title = "Klondike Solitaire";
+  screen.title =
+    state.kind === "freecell" ? "FreeCell Solitaire" : "Klondike Solitaire";
 
   const boardBox = blessed.box({
     top: 0,
@@ -70,10 +80,10 @@ export function startUi(
   function render(): void {
     const useColor = options.useColor !== false;
     boardBox.setContent(
-      renderBoard(state, { useColor, compact: options.compact }),
+      renderBoard(state, { useColor, compact: options.compact, theme }),
     );
     infoBox.setContent(renderInfo(state));
-    helpBox.setContent(renderHelp());
+    helpBox.setContent(renderHelp(state.kind));
     screen.render();
   }
 

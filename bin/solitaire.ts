@@ -9,7 +9,13 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { startUi } from "../src/ui";
-import { createGame, drawFromStock } from "../src/game";
+import { GameKind, createGame, drawFromStock, isGameKind } from "../src/game";
+import {
+  DEFAULT_THEME_NAME,
+  ThemeName,
+  isThemeName,
+  listThemes,
+} from "../src/theme";
 
 /**
  * CLI options.
@@ -17,11 +23,13 @@ import { createGame, drawFromStock } from "../src/game";
 interface CliOptions {
   help: boolean;
   version: boolean;
+  game: GameKind;
   drawCount: number;
   seed?: number;
   useColor: boolean;
   smoke: boolean;
   compact: boolean;
+  theme: ThemeName;
 }
 
 /**
@@ -45,10 +53,12 @@ function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
     help: false,
     version: false,
+    game: "klondike",
     drawCount: 3,
     useColor: true,
     smoke: false,
     compact: false,
+    theme: DEFAULT_THEME_NAME,
   };
 
   for (let i = 0; i < args.length; i += 1) {
@@ -73,10 +83,24 @@ function parseArgs(argv: string[]): CliOptions {
       const value = Number(args[i + 1]);
       if (!Number.isNaN(value)) options.seed = value;
       i += 1;
+    } else if (arg.startsWith("--game=")) {
+      const value = arg.split("=")[1];
+      if (isGameKind(value)) options.game = value;
+    } else if (arg === "--game") {
+      const value = args[i + 1];
+      if (isGameKind(value)) options.game = value;
+      i += 1;
     } else if (arg === "--no-color") {
       options.useColor = false;
     } else if (arg === "--compact") {
       options.compact = true;
+    } else if (arg.startsWith("--theme=")) {
+      const value = arg.split("=")[1];
+      if (isThemeName(value)) options.theme = value;
+    } else if (arg === "--theme") {
+      const value = args[i + 1];
+      if (isThemeName(value)) options.theme = value;
+      i += 1;
     } else if (arg === "--smoke") {
       options.smoke = true;
     }
@@ -90,15 +114,18 @@ function parseArgs(argv: string[]): CliOptions {
  * @returns {void}
  */
 function printHelp(): void {
+  const themeList = listThemes().join("|");
   const lines = [
     "Usage: npx @nekobato/solitaire [options]",
     "",
     "Options:",
-    "  --easy            Draw 1 card from stock (easier mode)",
-    "  --draw <1|3>       Draw count (default: 3)",
+    "  --game <klondike|freecell>  Select game (default: klondike)",
+    "  --easy            Draw 1 card from stock (Klondike only)",
+    "  --draw <1|3>       Draw count (Klondike only, default: 3)",
     "  --seed <number>    Deterministic shuffle seed",
     "  --no-color         Disable ANSI colors",
     "  --compact          Use compact card rendering",
+    `  --theme <${themeList}>  Color theme (default: ${DEFAULT_THEME_NAME})`,
     "  --help, -h         Show this help",
     "  --version, -v      Print version",
     "  --smoke            Run a smoke test and exit",
@@ -111,14 +138,31 @@ function printHelp(): void {
  * @returns {void}
  */
 function runSmoke(): void {
-  const state = createGame({ drawCount: 1, seed: 42 });
+  const state = createGame({ drawCount: 1, seed: 42, game: "klondike" });
+  if (state.kind !== "klondike") {
+    process.stderr.write("SMOKE_FAIL\n");
+    process.exit(1);
+  }
   const next = drawFromStock(state);
-  if (!next || next.waste.length === 0) {
+  if (!next || next.kind !== "klondike" || next.waste.length === 0) {
     process.stderr.write("SMOKE_FAIL\n");
     process.exit(1);
   }
   process.stdout.write("SMOKE_OK\n");
   process.exit(0);
+}
+
+function runSmokeForGame(game: GameKind): void {
+  if (game === "freecell") {
+    const state = createGame({ seed: 42, game });
+    if (state.kind !== "freecell" || state.freecells.length !== 4) {
+      process.stderr.write("SMOKE_FAIL\n");
+      process.exit(1);
+    }
+    process.stdout.write("SMOKE_OK\n");
+    process.exit(0);
+  }
+  runSmoke();
 }
 
 /**
@@ -132,13 +176,15 @@ function main(): void {
     process.stdout.write(readVersion() + "\n");
     return;
   }
-  if (options.smoke) return runSmoke();
+  if (options.smoke) return runSmokeForGame(options.game);
 
   startUi({
+    game: options.game,
     drawCount: options.drawCount,
     seed: options.seed,
     useColor: options.useColor,
     compact: options.compact,
+    theme: options.theme,
   });
 }
 

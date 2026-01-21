@@ -18,3 +18,16 @@ test("CLI smoke test", () => {
   assert.equal(result.status, 0);
   assert.match(result.stdout, /SMOKE_OK/);
 });
+
+test("CLI smoke test (freecell)", () => {
+  const cliPath = path.join(__dirname, "..", "bin", "solitaire.js");
+  const result = spawnSync(
+    process.execPath,
+    [cliPath, "--smoke", "--game", "freecell"],
+    {
+      encoding: "utf8",
+    },
+  );
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /SMOKE_OK/);
+});

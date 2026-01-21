@@ -11,6 +11,17 @@
 export type Suit = "S" | "H" | "C" | "D";
 
 /**
+ * Supported game kinds.
+ */
+export const GAME_KINDS = ["klondike", "freecell"] as const;
+
+export type GameKind = (typeof GAME_KINDS)[number];
+
+export function isGameKind(value: string | undefined): value is GameKind {
+  return value === "klondike" || value === "freecell";
+}
+
+/**
  * Card color.
  */
 export type Color = "red" | "black";
@@ -38,27 +49,49 @@ export type Held = {
   source:
     | { area: "tableau"; col: number; depth: number }
     | { area: "waste" }
+    | { area: "freecell"; index: number }
     | { area: "foundation"; suit: Suit };
   count: number;
 };
 
 /**
- * Complete game state.
+ * Base game state.
  */
-export interface GameState {
+export interface BaseGameState {
+  kind: GameKind;
   tableau: Card[][];
   foundations: Record<Suit, Card[]>;
-  stock: Card[];
-  waste: Card[];
   cursor: Cursor;
   held: Held | null;
   moves: number;
-  redeals: number;
-  drawCount: number;
   startedAt: number;
   message: string;
   won: boolean;
 }
+
+/**
+ * Klondike state.
+ */
+export interface KlondikeState extends BaseGameState {
+  kind: "klondike";
+  stock: Card[];
+  waste: Card[];
+  redeals: number;
+  drawCount: number;
+}
+
+/**
+ * FreeCell state.
+ */
+export interface FreeCellState extends BaseGameState {
+  kind: "freecell";
+  freecells: Array<Card | null>;
+}
+
+/**
+ * Complete game state.
+ */
+export type GameState = KlondikeState | FreeCellState;
 
 /**
  * Ordered suit list.
@@ -120,18 +153,44 @@ export function getCardColor(card: Card): Color {
 
 /**
  * Build a fresh game state with a shuffled deck.
- * @param {{ drawCount?: number; seed?: number }} options Creation options.
+ * @param {{ drawCount?: number; seed?: number; game?: GameKind }} options Creation options.
  * @returns {GameState} Initial state.
  */
 export function createGame(
-  options: { drawCount?: number; seed?: number } = {},
+  options: { drawCount?: number; seed?: number; game?: GameKind } = {},
 ): GameState {
   const drawCount = options.drawCount === 1 ? 1 : 3;
+  const game = options.game ?? "klondike";
   const rng =
     typeof options.seed === "number"
       ? createSeededRng(options.seed)
       : Math.random;
   const deck = shuffleDeck(createDeck(), rng);
+
+  const foundations: Record<Suit, Card[]> = { S: [], H: [], C: [], D: [] };
+
+  if (game === "freecell") {
+    const tableau: Card[][] = Array.from({ length: 8 }, () => []);
+    for (let i = 0; i < 52; i += 1) {
+      const card = deck.pop();
+      if (!card) throw new Error("Deck ran out while dealing.");
+      const col = i % 8;
+      tableau[col].push({ ...card, faceUp: true });
+    }
+    const state: FreeCellState = {
+      kind: "freecell",
+      tableau,
+      foundations,
+      freecells: Array.from({ length: 4 }, () => null),
+      cursor: { zone: "tableau", col: 0, depth: 0 },
+      held: null,
+      moves: 0,
+      startedAt: Date.now(),
+      message: "",
+      won: false,
+    };
+    return normalizeState(state);
+  }
 
   const tableau: Card[][] = [];
   for (let col = 0; col < 7; col += 1) {
@@ -146,9 +205,8 @@ export function createGame(
     tableau.push(column);
   }
 
-  const foundations: Record<Suit, Card[]> = { S: [], H: [], C: [], D: [] };
-
-  const state: GameState = {
+  const state: KlondikeState = {
+    kind: "klondike",
     tableau,
     foundations,
     stock: deck.map((card) => ({ ...card, faceUp: false })),
@@ -209,23 +267,40 @@ export function normalizeCursor(state: GameState): Cursor {
 
 /**
  * Find the top slot position list for cursor navigation.
- * @returns {{ kind: 'stock' | 'waste' | 'foundation'; suit?: Suit; x: number }[]} Slots.
+ * @param {GameState} state Current state.
+ * @returns {TopSlot[]} Slots.
  */
-export function getTopSlots(): {
-  kind: "stock" | "waste" | "foundation";
+export type TopSlot = {
+  kind: "stock" | "waste" | "foundation" | "freecell";
   suit?: Suit;
+  index?: number;
   x: number;
-}[] {
+};
+
+export function getTopSlots(state: GameState): TopSlot[] {
   const cellSpan = 6;
-  const columnX = [0, 1, 2, 3, 4, 5, 6].map((i) => i * cellSpan);
+  const columnX = state.tableau.map((_, i) => i * cellSpan);
+  if (state.kind === "freecell") {
+    return [
+      { kind: "freecell", index: 0, x: columnX[0] ?? 0 },
+      { kind: "freecell", index: 1, x: columnX[1] ?? cellSpan },
+      { kind: "freecell", index: 2, x: columnX[2] ?? cellSpan * 2 },
+      { kind: "freecell", index: 3, x: columnX[3] ?? cellSpan * 3 },
+      { kind: "foundation", suit: "S", x: columnX[4] ?? cellSpan * 4 },
+      { kind: "foundation", suit: "H", x: columnX[5] ?? cellSpan * 5 },
+      { kind: "foundation", suit: "C", x: columnX[6] ?? cellSpan * 6 },
+      { kind: "foundation", suit: "D", x: columnX[7] ?? cellSpan * 7 },
+    ];
+  }
+
   const foundationOffset = cellSpan;
   return [
-    { kind: "stock", x: columnX[0] },
-    { kind: "waste", x: columnX[1] },
-    { kind: "foundation", suit: "S", x: columnX[2] + foundationOffset },
-    { kind: "foundation", suit: "H", x: columnX[3] + foundationOffset },
-    { kind: "foundation", suit: "C", x: columnX[4] + foundationOffset },
-    { kind: "foundation", suit: "D", x: columnX[5] + foundationOffset },
+    { kind: "stock", x: columnX[0] ?? 0 },
+    { kind: "waste", x: columnX[1] ?? cellSpan },
+    { kind: "foundation", suit: "S", x: (columnX[2] ?? 0) + foundationOffset },
+    { kind: "foundation", suit: "H", x: (columnX[3] ?? 0) + foundationOffset },
+    { kind: "foundation", suit: "C", x: (columnX[4] ?? 0) + foundationOffset },
+    { kind: "foundation", suit: "D", x: (columnX[5] ?? 0) + foundationOffset },
   ];
 }
 
@@ -239,15 +314,15 @@ export function moveCursor(
   state: GameState,
   direction: "left" | "right" | "up" | "down",
 ): GameState {
-  const topSlots = getTopSlots();
+  const topSlots = getTopSlots(state);
+  const columnX = state.tableau.map((_, i) => i * 6);
   if (state.cursor.zone === "top") {
     const maxIndex = topSlots.length - 1;
     let nextIndex = state.cursor.index;
     if (direction === "left") nextIndex = Math.max(0, nextIndex - 1);
     if (direction === "right") nextIndex = Math.min(maxIndex, nextIndex + 1);
     if (direction === "down") {
-      const slot = topSlots[state.cursor.index];
-      const columnX = [0, 1, 2, 3, 4, 5, 6].map((i) => i * 6);
+      const slot = topSlots[state.cursor.index] ?? topSlots[0];
       const nearestCol = columnX.reduce(
         (best, x, col) => {
           const dist = Math.abs(x - slot.x);
@@ -272,10 +347,11 @@ export function moveCursor(
     const column = state.tableau[state.cursor.col] ?? [];
     const firstFaceUp = getFirstFaceUpIndex(column);
     if (direction === "left" || direction === "right") {
+      const maxCol = Math.max(0, state.tableau.length - 1);
       const nextCol =
         direction === "left"
           ? Math.max(0, state.cursor.col - 1)
-          : Math.min(6, state.cursor.col + 1);
+          : Math.min(maxCol, state.cursor.col + 1);
       return normalizeState({
         ...state,
         cursor: { zone: "tableau", col: nextCol, depth: state.cursor.depth },
@@ -336,11 +412,12 @@ export function moveCursor(
 export function canPlaceOnTableau(
   cards: Card[],
   targetColumn: Card[],
+  game: GameKind = "klondike",
 ): boolean {
   if (cards.length === 0) return false;
   const first = cards[0];
   if (targetColumn.length === 0) {
-    return first.rank === 13;
+    return game === "klondike" ? first.rank === 13 : true;
   }
   const target = targetColumn[targetColumn.length - 1];
   if (!target.faceUp) return false;
@@ -362,12 +439,49 @@ export function canPlaceOnFoundation(card: Card, foundation: Card[]): boolean {
   return top.suit === card.suit && card.rank === top.rank + 1;
 }
 
+function isValidSequence(cards: Card[]): boolean {
+  if (cards.length === 0) return false;
+  if (!cards[0].faceUp) return false;
+  for (let i = 0; i < cards.length - 1; i += 1) {
+    const current = cards[i];
+    const next = cards[i + 1];
+    if (!next.faceUp) return false;
+    if (getCardColor(current) === getCardColor(next)) return false;
+    if (current.rank !== next.rank + 1) return false;
+  }
+  return true;
+}
+
+function countEmptyFreecells(state: FreeCellState): number {
+  return state.freecells.filter((card) => !card).length;
+}
+
+function countEmptyTableauColumns(state: FreeCellState): number {
+  return state.tableau.filter((column) => column.length === 0).length;
+}
+
+export function getFreeCellMoveLimit(
+  state: FreeCellState,
+  targetCol: number,
+): number {
+  const emptyFreecells = countEmptyFreecells(state);
+  const emptyColumns = countEmptyTableauColumns(state);
+  const targetIsEmpty = (state.tableau[targetCol] ?? []).length === 0;
+  const usableEmptyColumns = targetIsEmpty
+    ? Math.max(0, emptyColumns - 1)
+    : emptyColumns;
+  return (emptyFreecells + 1) * 2 ** usableEmptyColumns;
+}
+
 /**
  * Draw cards from stock to waste (or redeal when empty).
  * @param {GameState} state Current state.
  * @returns {GameState} Next state.
  */
 export function drawFromStock(state: GameState): GameState {
+  if (state.kind !== "klondike") {
+    return { ...state, message: "No stock in FreeCell." };
+  }
   if (state.held) {
     return { ...state, message: "Place held cards first." };
   }
@@ -419,7 +533,13 @@ export function getHeldCards(state: GameState): Card[] {
     return column.slice(source.depth);
   }
   if (source.area === "waste") {
+    if (state.kind !== "klondike") return [];
     const card = state.waste[state.waste.length - 1];
+    return card ? [card] : [];
+  }
+  if (source.area === "freecell") {
+    if (state.kind !== "freecell") return [];
+    const card = state.freecells[source.index] ?? null;
     return card ? [card] : [];
   }
   const pile = state.foundations[source.suit];
@@ -450,7 +570,14 @@ export function removeHeldCards(state: GameState): GameState {
     return { ...state, tableau };
   }
   if (source.area === "waste") {
+    if (state.kind !== "klondike") return state;
     return { ...state, waste: state.waste.slice(0, -1) };
+  }
+  if (source.area === "freecell") {
+    if (state.kind !== "freecell") return state;
+    const freecells = state.freecells.slice();
+    freecells[source.index] = null;
+    return { ...state, freecells };
   }
   if (source.area === "foundation") {
     const foundations = {
@@ -470,13 +597,28 @@ export function removeHeldCards(state: GameState): GameState {
 export function pickUpAtCursor(state: GameState): GameState {
   if (state.held) return state;
   if (state.cursor.zone === "top") {
-    const slot = getTopSlots()[state.cursor.index];
+    const slot = getTopSlots(state)[state.cursor.index];
+    if (!slot) return state;
     if (slot.kind === "waste") {
+      if (state.kind !== "klondike") return state;
       if (state.waste.length === 0)
         return { ...state, message: "Waste is empty." };
       return {
         ...state,
         held: { source: { area: "waste" }, count: 1 },
+        message: "",
+      };
+    }
+    if (slot.kind === "freecell") {
+      if (state.kind !== "freecell") return state;
+      const card = state.freecells[slot.index ?? 0] ?? null;
+      if (!card) return { ...state, message: "FreeCell is empty." };
+      return {
+        ...state,
+        held: {
+          source: { area: "freecell", index: slot.index ?? 0 },
+          count: 1,
+        },
         message: "",
       };
     }
@@ -538,7 +680,7 @@ export function dropHeld(state: GameState): GameState {
   if (cards.length === 0)
     return { ...state, held: null, message: "Nothing to move." };
   if (state.cursor.zone === "top") {
-    const slot = getTopSlots()[state.cursor.index];
+    const slot = getTopSlots(state)[state.cursor.index];
     if (slot.kind === "foundation" && slot.suit && cards.length === 1) {
       const pile = state.foundations[slot.suit];
       if (canPlaceOnFoundation(cards[0], pile)) {
@@ -557,11 +699,58 @@ export function dropHeld(state: GameState): GameState {
       }
       return { ...state, held: null, message: "Cannot place on foundation." };
     }
+    if (slot.kind === "freecell") {
+      if (state.kind !== "freecell")
+        return { ...state, held: null, message: "Invalid target." };
+      if (cards.length !== 1)
+        return { ...state, held: null, message: "FreeCell holds one card." };
+      const index = slot.index ?? 0;
+      if (state.freecells[index])
+        return { ...state, held: null, message: "FreeCell is occupied." };
+      const removed = removeHeldCards(state);
+      if (removed.kind !== "freecell")
+        return { ...state, held: null, message: "Invalid target." };
+      const freecells = removed.freecells.slice();
+      freecells[index] = cards[0];
+      return normalizeState({
+        ...removed,
+        freecells,
+        held: null,
+        moves: removed.moves + 1,
+        message: "",
+      });
+    }
     return { ...state, held: null, message: "Invalid target." };
   }
 
   if (state.cursor.zone === "tableau") {
     const column = state.tableau[state.cursor.col] ?? [];
+    if (state.kind === "freecell") {
+      if (!isValidSequence(cards))
+        return { ...state, held: null, message: "Invalid sequence." };
+      if (!canPlaceOnTableau(cards, column, "freecell"))
+        return { ...state, held: null, message: "Cannot place on tableau." };
+      const limit = getFreeCellMoveLimit(state, state.cursor.col);
+      if (cards.length > limit) {
+        return {
+          ...state,
+          held: null,
+          message: "Not enough free cells or columns.",
+        };
+      }
+      const removed = removeHeldCards(state);
+      const targetCol = state.cursor.col;
+      const tableau = removed.tableau.map((col, index) =>
+        index === targetCol ? col.concat(cards) : col,
+      );
+      return normalizeState({
+        ...removed,
+        tableau,
+        held: null,
+        moves: removed.moves + 1,
+        message: "",
+      });
+    }
     if (canPlaceOnTableau(cards, column)) {
       const removed = removeHeldCards(state);
       const targetCol = state.cursor.col;
@@ -612,8 +801,8 @@ export function autoMove(state: GameState): GameState {
   }
 
   if (state.cursor.zone === "top") {
-    const slot = getTopSlots()[state.cursor.index];
-    if (slot.kind === "waste") {
+    const slot = getTopSlots(state)[state.cursor.index];
+    if (state.kind === "klondike" && slot?.kind === "waste") {
       const card = state.waste[state.waste.length - 1];
       if (!card) return { ...state, message: "Waste is empty." };
       const foundation = state.foundations[card.suit];
@@ -626,6 +815,27 @@ export function autoMove(state: GameState): GameState {
       return normalizeState({
         ...state,
         waste: state.waste.slice(0, -1),
+        foundations,
+        moves: state.moves + 1,
+        message: "",
+      });
+    }
+    if (state.kind === "freecell" && slot?.kind === "freecell") {
+      const index = slot.index ?? 0;
+      const card = state.freecells[index];
+      if (!card) return { ...state, message: "FreeCell is empty." };
+      const foundation = state.foundations[card.suit];
+      if (!canPlaceOnFoundation(card, foundation))
+        return { ...state, message: "Cannot auto-move." };
+      const freecells = state.freecells.slice();
+      freecells[index] = null;
+      const foundations = {
+        ...state.foundations,
+        [card.suit]: foundation.concat(card),
+      };
+      return normalizeState({
+        ...state,
+        freecells,
         foundations,
         moves: state.moves + 1,
         message: "",
@@ -677,8 +887,9 @@ export function autoMove(state: GameState): GameState {
 export function handleEnter(state: GameState): GameState {
   if (state.held) return dropHeld(state);
   if (state.cursor.zone === "top") {
-    const slot = getTopSlots()[state.cursor.index];
-    if (slot.kind === "stock") return drawFromStock(state);
+    const slot = getTopSlots(state)[state.cursor.index];
+    if (state.kind === "klondike" && slot?.kind === "stock")
+      return drawFromStock(state);
   }
   return pickUpAtCursor(state);
 }
