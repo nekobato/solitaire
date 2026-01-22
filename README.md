@@ -11,14 +11,12 @@ npx @nekobato/solitaire
 
 <img width="720" height="480" alt="klondike" src="https://github.com/user-attachments/assets/7273e012-fa36-4af6-a396-18b0efac0a34" />
 
-
 ```sh
 # FreeCell
 npx @nekobato/solitaire --game freecell
 ```
 
 <img width="720" height="460" alt="freecell" src="https://github.com/user-attachments/assets/0f33987a-d4a1-4498-8465-42ecee4d6eb2" />
-
 
 ## Overview
 

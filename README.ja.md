@@ -2,6 +2,20 @@
 
 ターミナルで遊べる TUI ソリティアです。クロンダイクとフリーセルに対応しています。
 
+```sh
+# クロンダイク
+npx @nekobato/solitaire
+```
+
+<img width="720" height="480" alt="klondike" src="https://github.com/user-attachments/assets/7273e012-fa36-4af6-a396-18b0efac0a34" />
+
+```sh
+# フリーセル
+npx @nekobato/solitaire --game freecell
+```
+
+<img width="720" height="460" alt="freecell" src="https://github.com/user-attachments/assets/0f33987a-d4a1-4498-8465-42ecee4d6eb2" />
+
 ## 概要
 
 - Node.js >= 18 が必要です
@@ -24,6 +38,13 @@ git clone https://github.com/nekobato/solitaire-cli.git
 npm install
 npm run start
 ```
+
+### コンパクトモード
+
+オプション `--compact` を付けるとコンパクト表示になります。
+
+<img width="720" height="460" alt="klondike_compact" src="https://github.com/user-attachments/assets/2a00f6da-65c2-4042-980a-e808f7c7357f" />
+<img width="720" height="460" alt="freecell_compact" src="https://github.com/user-attachments/assets/6fb18d9a-43b6-4310-ac4d-f62a8bccdbe4" />
 
 ### オプション
 
