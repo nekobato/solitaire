@@ -159,7 +159,7 @@ export function getCardColor(card: Card): Color {
 export function createGame(
   options: { drawCount?: number; seed?: number; game?: GameKind } = {},
 ): GameState {
-  const drawCount = options.drawCount === 1 ? 1 : 3;
+  const drawCount = options.drawCount === 3 ? 3 : 1;
   const game = options.game ?? "klondike";
   const rng =
     typeof options.seed === "number"

@@ -48,8 +48,7 @@ npx @nekobato/solitaire --help
 | Option                        | Description                                |
 | ----------------------------- | ------------------------------------------ |
 | `--game <klondike\|freecell>` | Select game (default: klondike)            |
-| `--easy`                      | Draw 1 card from stock (Klondike only)     |
-| `--draw <1\|3>`               | Draw count (Klondike only, default: 3)     |
+| `--draw <1\|3>`               | Draw count (Klondike only, default: 1)     |
 | `--seed <number>`             | Deterministic shuffle seed                 |
 | `--no-color`                  | Disable ANSI colors                        |
 | `--compact`                   | Use compact card rendering                 |
@@ -64,8 +63,8 @@ npx @nekobato/solitaire --help
 # Start FreeCell
 npx @nekobato/solitaire --game freecell
 
-# Start Klondike with a fixed seed and draw 1
-npx @nekobato/solitaire --seed 42 --draw 1
+# Start Klondike with a fixed seed and draw 3
+npx @nekobato/solitaire --seed 42 --draw 3
 ```
 
 ## Contributing

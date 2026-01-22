@@ -19,7 +19,7 @@ import { resolveTheme, Style, Theme } from "./theme";
 const SUIT_SYMBOL: Record<Suit, string> = { S: "♠", H: "♥", C: "♣", D: "♦" };
 const COMPACT_CELL_WIDTH = 5;
 const RICH_CARD_WIDTH = 7;
-const RICH_CARD_HEIGHT = 4;
+const RICH_CARD_HEIGHT = 5;
 const RICH_INNER_WIDTH = RICH_CARD_WIDTH - 2;
 const RICH_TABLEAU_OVERLAP = 1;
 const CARD_BACK_PATTERN = "░";
@@ -849,11 +849,9 @@ export function renderInfo(state: GameState): string {
   if (state.kind === "freecell") {
     const emptyFreecells = state.freecells.filter((card) => !card).length;
     return [
-      "FreeCell Solitaire",
       `FreeCells: ${emptyFreecells}/${state.freecells.length}`,
       `Moves: ${state.moves}`,
       `Time: ${minutes}:${seconds}`,
-      state.won ? "Status: WIN" : "Status: playing",
       state.message ? `Note: ${state.message}` : "",
     ]
       .filter(Boolean)
@@ -861,13 +859,23 @@ export function renderInfo(state: GameState): string {
   }
 
   const mode = state.drawCount === 1 ? "easy (draw 1)" : "standard (draw 3)";
+  const tableauCount = state.tableau.reduce(
+    (sum, column) => sum + column.length,
+    0,
+  );
+  const foundationCount = Object.values(state.foundations).reduce(
+    (sum, pile) => sum + pile.length,
+    0,
+  );
+  const wasteCount = state.waste.length;
+  const boardCount = tableauCount + foundationCount + wasteCount;
   return [
-    "Klondike Solitaire",
     `Mode: ${mode}`,
+    `Board: ${boardCount}`,
+    `Stock: ${state.stock.length}`,
     `Moves: ${state.moves}`,
     `Redeals: ${state.redeals}`,
     `Time: ${minutes}:${seconds}`,
-    state.won ? "Status: WIN" : "Status: playing",
     state.message ? `Note: ${state.message}` : "",
   ]
     .filter(Boolean)

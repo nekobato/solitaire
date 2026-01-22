@@ -54,7 +54,7 @@ function parseArgs(argv: string[]): CliOptions {
     help: false,
     version: false,
     game: "klondike",
-    drawCount: 3,
+    drawCount: 1,
     useColor: true,
     smoke: false,
     compact: false,
@@ -67,8 +67,6 @@ function parseArgs(argv: string[]): CliOptions {
       options.help = true;
     } else if (arg === "--version" || arg === "-v") {
       options.version = true;
-    } else if (arg === "--easy") {
-      options.drawCount = 1;
     } else if (arg.startsWith("--draw=")) {
       const value = Number(arg.split("=")[1]);
       if (value === 1 || value === 3) options.drawCount = value;
@@ -120,8 +118,7 @@ function printHelp(): void {
     "",
     "Options:",
     "  --game <klondike|freecell>  Select game (default: klondike)",
-    "  --easy            Draw 1 card from stock (Klondike only)",
-    "  --draw <1|3>       Draw count (Klondike only, default: 3)",
+    "  --draw <1|3>       Draw count (Klondike only, default: 1)",
     "  --seed <number>    Deterministic shuffle seed",
     "  --no-color         Disable ANSI colors",
     "  --compact          Use compact card rendering",

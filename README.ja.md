@@ -36,8 +36,7 @@ npx @nekobato/solitaire --help
 | オプション                    | 説明                                                 |
 | ----------------------------- | ---------------------------------------------------- |
 | `--game <klondike\|freecell>` | ゲーム種別を選択します（既定: klondike）             |
-| `--easy`                      | 山札から 1 枚引きにします（klondike のみ）           |
-| `--draw <1\|3>`               | 山札からの枚数を指定します（klondike のみ、既定: 3） |
+| `--draw <1\|3>`               | 山札からの枚数を指定します（klondike のみ、既定: 1） |
 | `--seed <number>`             | シャッフルのシードを指定します                       |
 | `--no-color`                  | ANSI カラーを無効化します                            |
 | `--compact`                   | コンパクトなカード表示にします                       |
@@ -52,8 +51,8 @@ npx @nekobato/solitaire --help
 # フリーセルを起動
 npx @nekobato/solitaire --game freecell
 
-# シードを固定してクロンダイクを 1 枚引きで起動
-npx @nekobato/solitaire --seed 42 --draw 1
+# シードを固定してクロンダイクを 3 枚引きで起動
+npx @nekobato/solitaire --seed 42 --draw 3
 ```
 
 ## コントリビュートの仕方

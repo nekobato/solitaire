@@ -48,7 +48,7 @@ const THEMES: Record<ThemeName, Theme> = {
     },
     foundationPlaceholder: { redFg: "red", blackFg: "white" },
     highlight: {
-      cursor: { border: { fg: "cyan" }, text: { bold: true } },
+      cursor: { border: { fg: "#38bdf8" }, text: { bold: true } },
       selected: { border: { fg: "yellow" }, text: { bold: true } },
       cursorSelected: { border: { fg: "green" }, text: { bold: true } },
     },
@@ -63,9 +63,15 @@ const THEMES: Record<ThemeName, Theme> = {
     },
     foundationPlaceholder: { redFg: "#fb7185", blackFg: "#e2e8f0" },
     highlight: {
-      cursor: { border: { fg: "#38bdf8" }, text: { bold: true } },
-      selected: { border: { fg: "#facc15" }, text: { bold: true } },
-      cursorSelected: { border: { fg: "#22c55e" }, text: { bold: true } },
+      cursor: { border: { fg: "#38bdf8", bold: true }, text: { bold: true } },
+      selected: {
+        border: { fg: "#f472b6", bold: true },
+        text: { bold: true },
+      },
+      cursorSelected: {
+        border: { fg: "#a3e635", bold: true },
+        text: { bold: true },
+      },
     },
   },
   light: {
@@ -93,9 +99,15 @@ const THEMES: Record<ThemeName, Theme> = {
     },
     foundationPlaceholder: { redFg: "#ff0000", blackFg: "#ffffff" },
     highlight: {
-      cursor: { border: { fg: "#00ffff" }, text: { bold: true } },
-      selected: { border: { fg: "#ffff00" }, text: { bold: true } },
-      cursorSelected: { border: { fg: "#00ff00" }, text: { bold: true } },
+      cursor: { border: { fg: "#00ffff", bold: true }, text: { bold: true } },
+      selected: {
+        border: { fg: "#ff00ff", bold: true },
+        text: { bold: true },
+      },
+      cursorSelected: {
+        border: { fg: "#00ff00", bold: true },
+        text: { bold: true },
+      },
     },
   },
 };
