@@ -858,21 +858,9 @@ export function renderInfo(state: GameState): string {
       .join("\n");
   }
 
-  const mode = state.drawCount === 1 ? "easy (draw 1)" : "standard (draw 3)";
-  const tableauCount = state.tableau.reduce(
-    (sum, column) => sum + column.length,
-    0,
-  );
-  const foundationCount = Object.values(state.foundations).reduce(
-    (sum, pile) => sum + pile.length,
-    0,
-  );
-  const wasteCount = state.waste.length;
-  const boardCount = tableauCount + foundationCount + wasteCount;
+  const drawLabel = state.drawCount === 1 ? "1" : "3";
   return [
-    `Mode: ${mode}`,
-    `Board: ${boardCount}`,
-    `Stock: ${state.stock.length}`,
+    `Card draw: ${drawLabel}`,
     `Moves: ${state.moves}`,
     `Redeals: ${state.redeals}`,
     `Time: ${minutes}:${seconds}`,
