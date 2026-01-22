@@ -35,9 +35,9 @@
     "blessed": "^0.1.81"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
-    "prettier": "^3.2.5",
+    "@types/node": "^25.0.10",
+    "prettier": "^3.8.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.9.3"
   }
 }

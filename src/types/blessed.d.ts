@@ -11,6 +11,9 @@ declare module "blessed" {
     width?: number | string;
     height?: number | string;
     tags?: boolean;
+    hidden?: boolean;
+    align?: "left" | "center" | "right";
+    valign?: "top" | "middle" | "bottom";
   }
 
   export interface KeyEvent {
@@ -24,6 +27,8 @@ declare module "blessed" {
       listener: (ch: string, key: KeyEvent) => void,
     ): void;
     on(event: string, listener: (...args: unknown[]) => void): void;
+    show(): void;
+    hide(): void;
   }
 
   export interface Box extends Element {}
