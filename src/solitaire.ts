@@ -8,14 +8,14 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { startUi } from "../src/ui";
-import { GameKind, createGame, drawFromStock, isGameKind } from "../src/game";
+import { startUi } from "./lib/ui";
+import { GameKind, createGame, drawFromStock, isGameKind } from "./lib/game";
 import {
   DEFAULT_THEME_NAME,
   ThemeName,
   isThemeName,
   listThemes,
-} from "../src/theme";
+} from "./lib/theme";
 
 /**
  * CLI options.

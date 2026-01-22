@@ -7,7 +7,7 @@
 
 import test = require("node:test");
 import assert = require("node:assert/strict");
-import { DEFAULT_THEME_NAME, isThemeName, resolveTheme } from "../src/theme";
+import { DEFAULT_THEME_NAME, isThemeName, resolveTheme } from "../lib/theme";
 
 test("resolveTheme falls back to the default theme", () => {
   const theme = resolveTheme("unknown");

@@ -7,8 +7,8 @@
 
 import test = require("node:test");
 import assert = require("node:assert/strict");
-import { createGame } from "../src/game";
-import { renderBoard } from "../src/render";
+import { createGame } from "../lib/game";
+import { renderBoard } from "../lib/render";
 
 test("renderBoard defaults to rich cards", () => {
   const state = createGame({ seed: 1 });

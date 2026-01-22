@@ -2,7 +2,7 @@
 
 [日本語版 README](README.ja.md)
 
-A CLI solitaire you can play in the terminal. Supports Klondike and FreeCell.
+A terminal UI (TUI) solitaire you can play in the terminal. Supports Klondike and FreeCell.
 
 ```sh
 # Klondike

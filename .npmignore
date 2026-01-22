@@ -1,0 +1,12 @@
+node_modules
+.DS_Store
+*.log
+
+src
+test
+dist/test
+
+plan.docx
+tsconfig.json
+package-lock.json
+pnpm-lock.yaml

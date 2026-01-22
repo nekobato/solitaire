@@ -1,18 +1,33 @@
 {
   "name": "@nekobato/solitaire",
   "version": "0.1.0",
-  "description": "CLI Klondike Solitaire for the terminal",
+  "description": "TUI Solitaire for the terminal",
+  "keywords": [
+    "solitaire",
+    "klondike",
+    "freecell",
+    "cli",
+    "terminal",
+    "blessed"
+  ],
   "license": "MIT",
   "bin": {
-    "solitaire": "bin/solitaire.js"
+    "solitaire": "dist/solitaire.js"
   },
   "engines": {
     "node": ">=18"
   },
+  "files": [
+    "dist/**"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "npm run build && node dist/bin/solitaire.js",
-    "test": "npm run build && node --test dist/test/*.test.js",
+    "prepublishOnly": "npm run build",
+    "start": "tsx src/solitaire.ts",
+    "test": "tsx --test src/test/**/*.test.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c ."
   },
@@ -21,7 +36,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
-    "typescript": "^5.4.5",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.4.5"
   }
 }

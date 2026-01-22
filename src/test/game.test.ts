@@ -16,7 +16,7 @@ import {
   createGame,
   drawFromStock,
   getFreeCellMoveLimit,
-} from "../src/game";
+} from "../lib/game";
 
 /**
  * Create a card helper for tests.
