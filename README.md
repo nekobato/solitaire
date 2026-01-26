@@ -56,36 +56,30 @@ Use `--help` to see the latest option list and available themes.
 npx @nekobato/solitaire --help
 ```
 
-| Option                        | Description                                |
-| ----------------------------- | ------------------------------------------ |
-| `--game <klondike\|freecell>` | Select game (default: klondike)            |
-| `--draw <1\|3>`               | Draw count (Klondike only, default: 1)     |
-| `--seed <number>`             | Deterministic shuffle seed                 |
-| `--no-color`                  | Disable ANSI colors                        |
-| `--compact`                   | Use compact card rendering                 |
-| `--theme <name>`              | Select color theme (see `--help` for list) |
-| `--help, -h`                  | Show help                                  |
-| `--version, -v`               | Print version                              |
-| `--smoke`                     | Run a smoke test and exit                  |
+| Option                        | Description                                   |
+| ----------------------------- | --------------------------------------------- |
+| `--game <klondike\|freecell>` | Select game (default: klondike)               |
+| `--draw <1\|3>`               | Draw count (Klondike only, default: 1)        |
+| `--seed <number>`             | Deterministic shuffle seed                    |
+| `--no-color`                  | Disable ANSI colors                           |
+| `--compact`                   | Use compact card rendering                    |
+| `--theme <name>`              | Select color theme (to be listed by --help)   |
+| `--help, -h`                  | Show help                                     |
+| `--version, -v`               | Print version                                 |
+| `--smoke`                     | Run a smoke test and exit (for development)   |
 
 ### Examples
 
 ```sh
-# Start FreeCell
-npx @nekobato/solitaire --game freecell
-
 # Start Klondike with a fixed seed and draw 3
 npx @nekobato/solitaire --seed 42 --draw 3
 ```
 
-## Contributing
-
-1. Fork the repository and create a feature branch
-2. Install dependencies
-3. Make changes, then run formatting and tests
+## Development
 
 ```sh
 npm install
+npm start
 npm run format
 npm run test
 ```

@@ -37,7 +37,7 @@ interface CliOptions {
  * @returns {string} Version string.
  */
 function readVersion(): string {
-  const pkgPath = path.join(__dirname, "..", "..", "package.json");
+  const pkgPath = path.join(__dirname, "../package.json");
   const raw = fs.readFileSync(pkgPath, "utf8");
   const pkg = JSON.parse(raw) as { version?: string };
   return pkg.version || "0.0.0";
@@ -137,15 +137,15 @@ function printHelp(): void {
 function runSmoke(): void {
   const state = createGame({ drawCount: 1, seed: 42, game: "klondike" });
   if (state.kind !== "klondike") {
-    process.stderr.write("SMOKE_FAIL\n");
+    console.error("SMOKE_FAIL");
     process.exit(1);
   }
   const next = drawFromStock(state);
   if (!next || next.kind !== "klondike" || next.waste.length === 0) {
-    process.stderr.write("SMOKE_FAIL\n");
+    console.error("SMOKE_FAIL");
     process.exit(1);
   }
-  process.stdout.write("SMOKE_OK\n");
+  console.log("SMOKE_OK");
   process.exit(0);
 }
 
@@ -153,10 +153,10 @@ function runSmokeForGame(game: GameKind): void {
   if (game === "freecell") {
     const state = createGame({ seed: 42, game });
     if (state.kind !== "freecell" || state.freecells.length !== 4) {
-      process.stderr.write("SMOKE_FAIL\n");
+      console.error("SMOKE_FAIL");
       process.exit(1);
     }
-    process.stdout.write("SMOKE_OK\n");
+    console.log("SMOKE_OK");
     process.exit(0);
   }
   runSmoke();
@@ -170,7 +170,7 @@ function main(): void {
   const options = parseArgs(process.argv);
   if (options.help) return printHelp();
   if (options.version) {
-    process.stdout.write(readVersion() + "\n");
+    console.log(readVersion());
     return;
   }
   if (options.smoke) return runSmokeForGame(options.game);
