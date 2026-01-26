@@ -56,17 +56,17 @@ Use `--help` to see the latest option list and available themes.
 npx @nekobato/solitaire --help
 ```
 
-| Option                        | Description                                   |
-| ----------------------------- | --------------------------------------------- |
-| `--game <klondike\|freecell>` | Select game (default: klondike)               |
-| `--draw <1\|3>`               | Draw count (Klondike only, default: 1)        |
-| `--seed <number>`             | Deterministic shuffle seed                    |
-| `--no-color`                  | Disable ANSI colors                           |
-| `--compact`                   | Use compact card rendering                    |
-| `--theme <name>`              | Select color theme (to be listed by --help)   |
-| `--help, -h`                  | Show help                                     |
-| `--version, -v`               | Print version                                 |
-| `--smoke`                     | Run a smoke test and exit (for development)   |
+| Option                        | Description                                 |
+| ----------------------------- | ------------------------------------------- |
+| `--game <klondike\|freecell>` | Select game (default: klondike)             |
+| `--draw <1\|3>`               | Draw count (Klondike only, default: 1)      |
+| `--seed <number>`             | Deterministic shuffle seed                  |
+| `--no-color`                  | Disable ANSI colors                         |
+| `--compact`                   | Use compact card rendering                  |
+| `--theme <name>`              | Select color theme (to be listed by --help) |
+| `--help, -h`                  | Show help                                   |
+| `--version, -v`               | Print version                               |
+| `--smoke`                     | Run a smoke test and exit (for development) |
 
 ### Examples
 
