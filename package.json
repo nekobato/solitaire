@@ -1,6 +1,6 @@
 {
   "name": "@nekobato/solitaire",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "TUI Solitaire for the terminal",
   "homepage": "https://github.com/nekobato/solitaire",
   "repository": {
