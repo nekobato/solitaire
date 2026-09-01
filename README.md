@@ -37,8 +37,8 @@ Run locally:
 
 ```sh
 git clone https://github.com/nekobato/solitaire-cli.git
-npm install
-npm run start
+pnpm install
+pnpm start
 ```
 
 ### Compact Mode
@@ -78,10 +78,10 @@ npx @nekobato/solitaire --seed 42 --draw 3
 ## Development
 
 ```sh
-npm install
-npm start
-npm run format
-npm run test
+pnpm install
+pnpm start
+pnpm format
+pnpm test
 ```
 
 ## License

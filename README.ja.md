@@ -35,8 +35,8 @@ npx @nekobato/solitaire
 
 ```sh
 git clone https://github.com/nekobato/solitaire-cli.git
-npm install
-npm run start
+pnpm install
+pnpm start
 ```
 
 ### コンパクトモード
@@ -83,9 +83,9 @@ npx @nekobato/solitaire --seed 42 --draw 3
 3. 変更を加え、整形とテストを実行します
 
 ```sh
-npm install
-npm run format
-npm run test
+pnpm install
+pnpm format
+pnpm test
 ```
 
 ## ライセンス

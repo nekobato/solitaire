@@ -1,6 +1,7 @@
 {
   "name": "@nekobato/solitaire",
   "version": "0.1.2",
+  "packageManager": "pnpm@10.33.0",
   "description": "TUI Solitaire for the terminal",
   "homepage": "https://github.com/nekobato/solitaire",
   "repository": {
@@ -34,19 +35,19 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "pnpm run build",
     "start": "tsx src/solitaire.ts",
     "test": "tsx --test src/test/**/*.test.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c ."
   },
   "dependencies": {
-    "blessed": "^0.1.81"
+    "blessed": "0.1.81"
   },
   "devDependencies": {
-    "@types/node": "^26.0.1",
-    "prettier": "^3.8.1",
-    "tsx": "^4.21.0",
-    "typescript": "^7.0.2"
+    "@types/node": "26.0.1",
+    "prettier": "3.8.1",
+    "tsx": "4.21.0",
+    "typescript": "7.0.2"
   }
 }

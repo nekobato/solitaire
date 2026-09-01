@@ -12,11 +12,11 @@ updates:
     cooldown:
       default-days: 7
     groups:
-      npm-version-updates:
+      pnpm-version-updates:
         applies-to: "version-updates"
         patterns:
           - "*"
-      npm-security-updates:
+      pnpm-security-updates:
         applies-to: "security-updates"
         patterns:
           - "*"
