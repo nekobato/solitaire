@@ -20,7 +20,7 @@ npx @nekobato/solitaire --game freecell
 
 ## Overview
 
-- Requires Node.js >= 18
+- Requires Node.js >= 22
 - Terminal UI built with [blessed](https://github.com/chjj/blessed)
 - Reproducible shuffles via seed
 - Supports color themes and compact rendering

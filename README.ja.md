@@ -18,7 +18,7 @@ npx @nekobato/solitaire --game freecell
 
 ## 概要
 
-- Node.js >= 18 が必要です
+- Node.js >= 22 が必要です
 - 端末 UI は blessed を使用しています
 - シード指定で同じシャッフルを再現できます
 - 色テーマやコンパクト表示に対応しています
