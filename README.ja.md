@@ -34,7 +34,8 @@ npx @nekobato/solitaire
 ローカルで実行する場合:
 
 ```sh
-git clone https://github.com/nekobato/solitaire-cli.git
+git clone https://github.com/nekobato/solitaire.git
+cd solitaire
 pnpm install
 pnpm start
 ```
