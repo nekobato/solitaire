@@ -36,14 +36,15 @@ npx @nekobato/solitaire
 Run locally:
 
 ```sh
-git clone https://github.com/nekobato/solitaire-cli.git
+git clone https://github.com/nekobato/solitaire.git
+cd solitaire
 pnpm install
 pnpm start
 ```
 
 ### Compact Mode
 
-Add option `-compact` to play compact mode.
+Add option `--compact` to play compact mode.
 
 <img width="720" height="460" alt="klondike_compact" src="https://github.com/user-attachments/assets/2a00f6da-65c2-4042-980a-e808f7c7357f" />
 <img width="720" height="460" alt="freecell_compact" src="https://github.com/user-attachments/assets/6fb18d9a-43b6-4310-ac4d-f62a8bccdbe4" />
